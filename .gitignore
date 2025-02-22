@@ -11,12 +11,7 @@ __pycache__
 /venv
 /libs/libs.egg-info
 *.DS_Store
-/libs/maya
-/libs/PySide2
-/libs/pymel
-/libs/flux
-libs/shiboken2.py
-/.rigpy
+/.pyarmy
 
 # Darwin
 *.DS_Store
