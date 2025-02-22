@@ -1,0 +1,24 @@
+# Allowing stable installs to be checked in:
+# *.c
+# !frob_*.c
+# !custom.c
+
+
+# Python holdovers from rigpy for autocomplete etc in the maya python plugins
+__pycache__
+*.pyc
+*.bak
+/venv
+/libs/libs.egg-info
+*.DS_Store
+/libs/maya
+/libs/PySide2
+/libs/pymel
+/libs/flux
+libs/shiboken2.py
+/.rigpy
+
+# Darwin
+*.DS_Store
+# Prerequisites
+*.d
