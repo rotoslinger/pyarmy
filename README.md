@@ -9,8 +9,10 @@
 3. Select **Open in Integrated Terminal**.
 6. In the integrated terminal, run the `.bat` file by typing:
     ```bash
-    install.bat
+    .\install.bat
     ```
+7. Alternatively type install and then hit the tab button to autocomplete.
+8. press enter
 
 ### Installing a Virtual Environment Manually (don't do this, use the batch script instructions instead)
 
