@@ -1,11 +1,12 @@
-import pygame, sys
+import pygame, sys, os
 
 clock = pygame.time.Clock()
 
 from pygame.locals import *
+
 pygame.init()
 
-pygame.display.set_caption('pygame window')
+pygame.display.set_caption('pyarmy')
 
 WINDOW_SIZE = (600,400)
 
@@ -20,6 +21,10 @@ display = pygame.Surface((300,200))
 
 screen = pygame.display.set_mode(WINDOW_SIZE,0,32)
 
+# Tiled program!!!!
+# tutorial https://www.youtube.com/watch?v=N6xqCwblyiw&t=52s
+# software download!
+# https://thorbjorn.itch.io/tiled
 
 game_map = [['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
             ['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
@@ -57,7 +62,6 @@ hopping_down = False
 hopping_right = False
 hopping_left = False
 
-
 current_hop = 0
 hop_size = 27
 
@@ -82,8 +86,8 @@ cam_pos_x = 0
 
 cam_pos_y_tile = 0
 cam_pos_x_tile = 0
-player_rect = pygame.Rect(150,100,player_image.get_width(),player_image.get_height()-12,)
-
+player_rect = pygame.Rect(150,100,player_image.get_width(),
+                          player_image.get_height()-12,)
 
 def guy_create(guy):
   guy[0].x = guy[1]+cam_pos_x
@@ -92,12 +96,8 @@ def guy_create(guy):
   display.blit(guy_image,(guy[0].x,guy[0].y+guy[3]- 11))
   
 
-def collide(object_rect, ):
+def collide(object_rect):
   return
-
-#pygame.transform.rotate(player_rect,35)
-
-
 
 movement = [0,0]
 
@@ -110,14 +110,50 @@ def move(pos,move_amount):
 
 
 def camera_set(focal_point):
-  global cam_pos_x
-  global cam_pos_y
-  global cam_pos_x_tile
-  global cam_pos_y_tile
-  cam_pos_x = -focal_point[0]+100
-  cam_pos_y = -focal_point[1]+100
-  cam_pos_x_tile = (shadow_pos[0]*0.25*height+shadow_pos[1]*0.25*height)/16
-  cam_pos_y_tile = (shadow_pos[0]*0.5*width+shadow_pos[1]*-0.5*width)/16
+    global cam_pos_x
+    global cam_pos_y
+    global cam_pos_x_tile
+    global cam_pos_y_tile
+
+    cam_pos_x = -focal_point[0] + 100
+    cam_pos_y = -focal_point[1] + 100
+    
+    ################################################################
+    # Inverse matrix calculation for world to tile conversion
+    # If you have Matrix A:
+    #      _     _
+    # A  =| a,  b |
+    #     | c,  d |
+    #      ‾     ‾
+    # Invert the diagonals and negate from bottom left to upper right:
+    #      _     _
+    # A⁻¹=| d, -b |
+    #     | -c, a |
+    #      ‾     ‾
+    # Calculate the determinant:
+    # a * d - b * c
+    #
+    # newly inverted a,b,c,d:
+    # inv_a = d
+    # inv_b = -b
+    # inv_c = -c
+    # inv_d = a
+    ################################################################
+    
+    # Calculate the determinant
+    # det = a * d - b * c
+    # inv_det is the reciprocal of this determinant, used to scale the transformation matrix
+    inv_det = 1 / ((0.5 * width * 0.25 * height) - (-0.5 * width * 0.25 * height))
+
+    # Compute the inverse elements
+    inv_a = 0.25 * height * inv_det
+    inv_b = 0.5 * width * inv_det
+    inv_c = -0.25 * height * inv_det
+    inv_d = -0.5 * width * inv_det
+
+    # Convert screen-space movement to tile-space
+    cam_pos_x_tile = int((inv_a * shadow_pos[0] + inv_b * shadow_pos[1]) / 16)
+    cam_pos_y_tile = int((inv_c * shadow_pos[0] + inv_d * shadow_pos[1]) / 16)
 
 
 print("outside")
@@ -139,19 +175,20 @@ while True:
   camera_set(shadow_pos)
 
 
-
-
-  y = cam_pos_y_tile/16
+  y = cam_pos_y_tile / 16
 
   for row in game_map:
-    x = cam_pos_x_tile/16
-    for tile in row:
-      if tile != '0':
-        display.blit (block, (x*0.5*width+y*-0.5*width   ,  x*0.25*height+y*0.25*height))
-      x += 1
-    y += 1
-
-
+      x = cam_pos_x_tile / 16
+      for tile in row:
+          if tile != '0':
+              # Adjust by negating the player's movement to pan correctly
+              t_width = int((x * 0.5 * width) + (y * -0.5 * width)) + cam_pos_x
+              t_height = int((x * 0.25 * height) + (y * 0.25 * height)) + cam_pos_y
+              
+              display.blit(block, (t_width, t_height))
+          x += 1
+      y += 1
+    
 
   # gets the player inputs
 
