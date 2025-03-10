@@ -1,6 +1,6 @@
 @echo off
 
-py -m venv .pyarmy
+python -m venv .pyarmy
 
 :: Activate the virtual environment
 call .pyarmy\Scripts\activate.bat
