@@ -3,5 +3,34 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"python.defaultInterpreterPath": ".pyarmy/Scripts/python.exe",
+		// The virtual environment automatically hidden to avoid long dropdown
+		"files.exclude": {
+			"**.pyarmy": true
+		},	
+		"editor.formatOnType": true,
+		"editor.formatOnSave": false,
+		"editor.rulers": [120],
+
+		////////////////////////////////////////
+		// AUTO PEP8 SETTINGS
+		"editor.defaultFormatter": "ms-python.autopep8",
+		"editor.defaultFoldingRangeProvider": "ms-python.autopep8",
+		// "autopep8.interpreter": ["C:/Program Files/Python310/python.exe"], // FALLBACK
+		"autopep8.interpreter": [
+			".rigpy/Scripts/python.exe"
+		],
+		"autopep8.args": [
+			"--max-line-length",
+			"120",
+			"--experimental",
+			// double aggressive for single arg per line over line length limit
+			"--aggressive",
+			"--aggressive",
+			// Not sure if I will need this
+			// "--recursive",
+
+		],
 }

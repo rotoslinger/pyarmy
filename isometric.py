@@ -120,6 +120,9 @@ def camera_set(focal_point):
     
     ################################################################
     # Inverse matrix calculation for world to tile conversion
+    
+    # Theory:
+    
     # If you have Matrix A:
     #      _     _
     # A  =| a,  b |
@@ -138,14 +141,39 @@ def camera_set(focal_point):
     # inv_b = -b
     # inv_c = -c
     # inv_d = a
+    
+    # Practice: 
+    # in your tilemap, you are creating your tile dimensions this way:
+    
+    # tile_width  = (x * 0.5 * width) + (y * -0.5 * width)
+    # tile_height = (x * 0.25 * height) + (y * 0.25 * height)
+    
+    # lets break this down into the
+    
+    # getting the parts of the determinant while factoring in the tile-map scaling
+    # a ---  0.5  * width 
+    # b ---  0.25 * height
+    # c --- -0.5  * width
+    # d ---  0.25 * height
+    
+    # final parts of the determinant
+    # determinant = a * d - b * c
+    
+    # get the reciprocal of the determinant
+    # inverse determinant = 1 / det
+    
     ################################################################
     
-    # Calculate the determinant
-    # det = a * d - b * c
+    # Calculate the determinant 
     # inv_det is the reciprocal of this determinant, used to scale the transformation matrix
     inv_det = 1 / ((0.5 * width * 0.25 * height) - (-0.5 * width * 0.25 * height))
 
     # Compute the inverse elements
+    # These values are derived from the inverse of the affine transformation matrix
+
+    # IMPORTANT This is the core of this whole step!
+    # You are transforming your ORTHOGRAPHIC view back to ISOMETRIC!
+    # you are essentially rotating your camera move counter clock-wise 🕘 while still doing the original movement
     inv_a = 0.25 * height * inv_det
     inv_b = 0.5 * width * inv_det
     inv_c = -0.25 * height * inv_det
@@ -154,6 +182,8 @@ def camera_set(focal_point):
     # Convert screen-space movement to tile-space
     cam_pos_x_tile = int((inv_a * shadow_pos[0] + inv_b * shadow_pos[1]) / 16)
     cam_pos_y_tile = int((inv_c * shadow_pos[0] + inv_d * shadow_pos[1]) / 16)
+    
+    # YEEEEEAAAAAAH 🤘😆🤘 (ʘ‿ʘ)
 
 
 print("outside")
@@ -168,7 +198,7 @@ while True:
     temp_army_size+= 1
 
   move(shadow_pos,movement)
-  #sets the player position (basicaly the players position is an offset from the shado)
+  # sets the player position (basicaly the players position is an offset from the shadow)
   player_rect.x = shadow_pos[0] + cam_pos_x
   player_rect.y = shadow_pos[1]-z - 11+ cam_pos_y
   
@@ -181,7 +211,7 @@ while True:
       x = cam_pos_x_tile / 16
       for tile in row:
           if tile != '0':
-              # Adjust by negating the player's movement to pan correctly
+              # move the tilemap in the opposite direction of the players movement
               t_width = int((x * 0.5 * width) + (y * -0.5 * width)) + cam_pos_x
               t_height = int((x * 0.25 * height) + (y * 0.25 * height)) + cam_pos_y
               
